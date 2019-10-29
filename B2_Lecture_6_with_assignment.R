@@ -423,7 +423,7 @@ boot.ci(bootResults, type = "bca", index = 3) # airplay
 
 # 3. [4 points] For this question you'll need the dataset:
 
-dat <- read.csv('Monitor_Birds.csv')
+dat <- read.csv('https://raw.githubusercontent.com/hashtagcpt/biostats2/master/Monitor_Birds.csv')
 
 # Within this data set, you'll find three categorical variables that define three groups of birds, Control, Flicker, and Noise. Create three bar graph with error bars that represent standard error of the mean for three dependent measures: postCh, postAx, and postRE. Run three 1-way anovas on each of these variables, first using Levene's test to check the homogeneity of variance. Finally, run Tukey's Honestly Significant Difference Post-hoc test. Which pairs of conditions are different from one another according to this test at an alpha of p < .1?       
 
