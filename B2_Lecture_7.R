@@ -489,7 +489,7 @@ df_pwr_analysis <- data.frame(eff_sizes, n_var)
 
 (n_v_eff_plot <- ggplot(data = df_pwr_analysis, aes(x = eff_sizes, y = n_var)) + geom_line(size = 2) + xlab("effect size (Cohen's d)") + ylab('number of samples required for power = 80%') + theme(text = element_text(size=16), axis.text.x = element_text(size = 16), axis.text.y = element_text(size=16)))
 
-# what is the n for a t-test with a smallish effect size for a 20% chance of missing a true effect? Suprisingly large!
+# what is the n for a t-test with a smallish effect size for a 20% chance of missing a true effect? Suprisingly large! The other type of analysis that could be of interest could come from having a fixed n and computing power/effect size for varying levels of effect size/power. This situation could arise if the main limit on your data collection comes from time/cost. 
 
 p.calc <- pwr.t.test(power = 0.8, d=0.2, sig.level = 0.05) 
 
