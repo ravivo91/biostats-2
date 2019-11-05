@@ -468,6 +468,8 @@ pwr.t.test(n=48*2,d=0.2,sig.level=0.05)
 power.out <- pwr.t.test(n=48*2,d=0.2,sig.level=0.05)
 ls(power.out)
 
+pwr.t.test(n=48*2,d=0.2,sig.level=0.05, type = "paired", alternative = "two.sided")
+
 # Pre-planned power analysis -- before an experiment one generally does not have a good estimate of the power of a given experimental design. The question usually becomes, "How many subjects do I need to run?" To answer this question one can compute the N required for a range of effect sizes that you would deem interesting. This is can be done using a loop and plotting how n varies with the effect size. For example.
 
 # choose a range of effect sizes of interest using the sequence function
@@ -487,7 +489,7 @@ df_pwr_analysis <- data.frame(eff_sizes, n_var)
 
 (n_v_eff_plot <- ggplot(data = df_pwr_analysis, aes(x = eff_sizes, y = n_var)) + geom_line(size = 2) + xlab("effect size (Cohen's d)") + ylab('number of samples required for power = 80%') + theme(text = element_text(size=16), axis.text.x = element_text(size = 16), axis.text.y = element_text(size=16)))
 
-# what is the n for a t-test with a smallish effect size for a 20% chance of missing a true effec? Suprisingly large!
+# what is the n for a t-test with a smallish effect size for a 20% chance of missing a true effect? Suprisingly large!
 
 p.calc <- pwr.t.test(power = 0.8, d=0.2, sig.level = 0.05) 
 
