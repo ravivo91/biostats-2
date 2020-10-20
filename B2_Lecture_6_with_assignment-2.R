@@ -1,4 +1,4 @@
-#### BIOSTATS 2 - WEEK 3 SCRIPT ####
+#### BIOSTATS 2 - 2020 - Oct-20 SCRIPT ####
 #rm(list = ls())
 library(ggplot2)
 
@@ -88,8 +88,6 @@ ggsave('boxplot.tif', device = 'tiff', plot = pBox)
 
 #### Exercise 3 ####
 # Exercise 3 -- Create a minimal data.frame with S+, S-, and S from the data BEFORE we took the log10 of threhsold (i.e., dFull). Create two scatter plots. One of S+ versys S thresholds, the second S- versus S thresholds. Save this data.frame with write.csv('my_filename_with_data.csv') -- you'll use this for a task in assignment #2. Note, you'll want to name S+ something like S_positive, as you want to avoid symbols in variable names.
-
-#### TODAY ####
 
 ### Patchwork -- making graphs on one plot ####
 
