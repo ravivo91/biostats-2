@@ -20,3 +20,25 @@
 
 # A1.6 [6 points] ####
 # Your task is to create a function called trimmed_mean. This function will remove variables from our input data that are greater than and less than a user-defined number of standard deviations above AND below the mean. Here is some code to get you started:
+
+# generate some fake data
+number_of_samples <- 1000
+x <- rnorm(number_of_samples) 
+# compute the standard deviation of x and assign it to xsd
+xsd <- sd(x)
+# we can use the square bracket syntax with a logical statement, for example if we want to trim variables that are 2 standard deviations above the mean: 
+standard_deviation_cuttoff <- 1
+x_up_trim <- x[x < standard_deviation_cuttoff*xsd]
+
+# looked at the trimmed mean
+upper_trimmed_mean <- mean(x_up_trim)
+# Look at the original mean - how do they differ? Food for thought: when would you want to compute a trimmed mean?
+untrimmed_mean <- mean(x)
+
+# here is function code for you to fill in:
+
+trimmed_mean <- function(data_to_trim, standard_devation_cutoff) {
+        # YOUR TRIMMING CODE GOES HERE
+        tm <- 1 
+        return(tm)
+}
