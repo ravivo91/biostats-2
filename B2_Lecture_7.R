@@ -362,7 +362,7 @@ colnames(dTransform) <- c('subject','RE','A','L','M','Sneg','Spos','S')
 dTransform_long <- melt(dTransform, id.vars = c('subject','RE')) 
 colnames(dTransform_long) <- c('subject','RE','condition', 'threshold')
 
-# There is an assumption of homogenity of variance behind the ANOVA. We can test this using Levene's Test from the car pakacage. The test checks the variance of the *residuals* for each group.  
+# There is an assumption of homogenity of variance behind the ANOVA. We can test this using Levene's Test from the car package. The test checks the variance of the *residuals* for each group.  
 library(car)
 leveneTest(dTransform_long$threshold, dTransform_long$condition, center = median)
 
