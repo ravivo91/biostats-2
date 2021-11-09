@@ -520,6 +520,7 @@ m_choice <- 2
 # We also know the number of trials for each condition because we used what's known as the method of constant stimuli
 n_trials <- 25
 
+# We need to download and set the appropriate working directories as the R.matlab toolbox does not use URL downloads. Can you discover a way to fetch the file from the github site and download it automatically?
 psy_file <- 'ONOFF02-dog-ON-1-04-Apr-2019.mat'
 d_file <- readMat(psy_file)
 
