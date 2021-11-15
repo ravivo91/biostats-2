@@ -521,7 +521,7 @@ m_choice <- 2
 n_trials <- 25
 
 # We need to download and set the appropriate working directories as the R.matlab toolbox does not use URL downloads. Can you discover a way to fetch the file from the github site and download it automatically?
-psy_file <- 'ONOFF02-dog-ON-1-04-Apr-2019.mat'
+psy_file <- download.file('https://github.com/hashtagcpt/biostats-2/raw/master/ONOFF01-dog-OFF-1-29-Mar-2019.mat','ONOFF01-dog-OFF-1-29-Mar-2019.mat')
 d_file <- readMat(psy_file)
 
 # do some data clean-up and get meaningful information from the filename
