@@ -31,5 +31,3 @@ t.test(random_data$x, random_data$y, var.equal = FALSE)
 # HINT: it will be useful to use the help. For example ?rnorm ?rt ?t.test
 
 # 4. t.test takes several options (as you'll see using ?t.test) change the var.equal to TRUE and enter the command below. How does this change the t.test that R is calculating?
-
-# 5. 
