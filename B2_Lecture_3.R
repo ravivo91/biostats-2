@@ -1,13 +1,14 @@
 #### BIOSTATS 2 - WEEK 3 SCRIPT ####
 #rm(list = ls())
 library(ggplot2)
+library(utils)
 
 #### read in data from the web ####
 dFull <- read.csv('https://raw.githubusercontent.com/hashtagcpt/biostats2/master/full_data.csv')
 
 #### Exercise 1 - download data, setwd in code and read in locally
 #
-#
+# setwd("C:/Users/chris/Dropbox/Teaching/Teaching_2023/biostats-2-master/biostats-2")
 #dFull <- read.csv('full_data.csv')
 
 # The function factor will change a numeric variable to a factor this creates categorical variables.
@@ -27,16 +28,25 @@ t6<-log10(dFull$thr6)
 
 # Rather than working with the entire data set we can make a more manageably sized data set with data.frame()
 dTransform <- data.frame(subject,RE,t1,t2,t3,t4,t5,t6)
+
 # It is useful to rename columns such that they have meaningful names. That is, meaningful to future you... here L, M, and S are meaningful because they refer to cone types. 
 colnames(dTransform) <- c('subject','RE','A','L','M','Sneg','Spos','S')
 
+utils::browseURL('https://iovs.arvojournals.org/article.aspx?articleid=2702942')
+
 #### SCATTER PLOT - ggplot2 ####
 
-# We can create a simple scatter plot using ggplot2 for RE versus A. 
+# We can create a simple scatter plot using ggplot2 for RE versus A
+
 pA <- ggplot(data = dTransform, aes(x=RE,y=A)) + geom_point() 
+pA
 
 # What is going on here? All ggplots take an initialization command that uses an aesthetic or aes() to initialize. Then you need to add least one geom layer to the plot. Here we are using geom_point... but we can use geom_bar, geom_boxplot, geom_errorbar and more. Go to https://ggplot2.tidyverse.org/reference/. Wait we can do that in RStudio...
+browseURL('https://ggplot2.tidyverse.org/reference/')
+
 utils::browseURL('https://ggplot2.tidyverse.org/reference/')
+
+
 # ... that's a long, but ultimately useful, list. 
 
 # Axes always need to be labeled. 
@@ -59,8 +69,7 @@ View(dFull_wide)
 #### RUN THE FUNCTIONS AT THE BOTTOM OF THE SCRIPT ####
 
 # This is a within-subjects design -- each of A, L, M, S-, S+, and S were measured within subjects. 
-datac <- summarySEwithin(dFull_long, measurevar='value', withinvars='variable', idvar='subject')
-datac
+
 
 #### bar-graph with within subject error-bars ####
 pBar <- ggplot(datac, aes(x=variable, y=value, group=1)) + geom_bar(aes(fill = variable), stat = 'identity') + geom_errorbar(width=.1, aes(ymin=value-ci, ymax=value+ci))
@@ -69,6 +78,7 @@ pBar
 #### box-plot ####
 pBox <- ggplot(data = dFull_long, aes(x = variable, y=value)) + geom_boxplot() + xlab('stimulus') + ylab(expression(log[10](threshold)))
 print(pBox)
+
 # What about writing a plot instead of viewing it?
 ggsave('boxplot.tif', device = 'tiff', plot = pBox)
 
@@ -86,8 +96,9 @@ ggsave('boxplot.tif', device = 'tiff', plot = pBox)
 
 # Exercise 2D - Our scatter plot could use a regression line. Try stat_smooth -- for help ?stat_smooth -- this is another type of layer that you can add to a ggplot. The default inputs for stat smooth might not be the correct one. Try the defaults and then try 'lm'.
 
-# Exercise 3 -- Create a minimal data.frame with S+, S-, and S from the data BEFORE we took the log10 of threhsold (i.e., dFull). Create two scatter plots. One of S+ versys S thresholds, the second S- versus S thresholds. Save this data.frame with write.csv('my_filename_with_data.csv') -- you'll use this for a task in assignment #2
+# Exercise 3 -- Create a minimal data.frame with S+, S-, and S from the data BEFORE we took the log10 of threshold (i.e., dFull). Create two scatter plots. One of S+ versus S thresholds, the second S- versus S thresholds. Save this data.frame with write.csv('my_filename_with_data.csv') -- you'll use this for a task in assignment #2
 
+write.csv()
 
 #### RUN the code below to get the functions normDataWithin, summarySEwithin, summarySE ####
 
@@ -180,12 +191,11 @@ normDataWithin <- function(data=NULL, idvar, measurevar, betweenvars=NULL,
 ##   idvar: the name of a column that identifies each subject (or matched subjects)
 ##   na.rm: a boolean that indicates whether to ignore NA's
 ##   conf.interval: the percent range of the confidence interval (default is 95%)
-summarySEwithin <- function(data=NULL, measurevar, betweenvars=NULL, withinvars=NULL,
-                            idvar=NULL, na.rm=FALSE, conf.interval=.95, .drop=TRUE) {
+summarySEwithin <- function(data=NULL, measurevar, betweenvars=NULL, withinvars=NULL, idvar=NULL, na.rm=FALSE, conf.interval=.95, .drop=TRUE) {
   
+
   # Ensure that the betweenvars and withinvars are factors
-  factorvars <- vapply(data[, c(betweenvars, withinvars), drop=FALSE],
-                       FUN=is.factor, FUN.VALUE=logical(1))
+  factorvars <- vapply(data[, c(betweenvars, withinvars), drop=FALSE], FUN=is.factor, FUN.VALUE=logical(1))
   
   if (!all(factorvars)) {
     nonfactorvars <- names(factorvars)[!factorvars]
@@ -228,5 +238,5 @@ summarySEwithin <- function(data=NULL, measurevar, betweenvars=NULL, withinvars=
   merge(datac, ndatac)
 }
 
-# The functions above are from:
+# The functions above are derived from:
 # utils::browseURL('http://www.cookbook-r.com/Graphs/Plotting_means_and_error_bars_(ggplot2)/#Helper%20functions')

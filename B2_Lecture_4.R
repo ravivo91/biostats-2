@@ -33,15 +33,14 @@ colnames(dTransform) <- c('subject','RE','A','L','M','Sneg','Spos','S')
 #### SCATTER PLOT - ggplot2 ####
 
 # We can create a simple scatter plot using ggplot2 for RE versus A. 
-pA <- ggplot(data = dTransform, aes(x=RE,y=A)) + geom_point() 
+pSpos <- ggplot(data = dTransform, aes(x=RE,y=Spos)) + geom_point() + stat_smooth(method = 'lm')
+pSpos
 
 # What is going on here? All ggplots take an initialization command that uses an aesthetic or aes() to initialize. Then you need to add least one geom layer to the plot. Here we are using geom_point... but we can use geom_bar, geom_boxplot, geom_errorbar and more. Go to https://ggplot2.tidyverse.org/reference/. Wait we can do that in RStudio...
 #utils::browseURL('https://ggplot2.tidyverse.org/reference/')
 # ... that's a long, but ultimately useful, list. 
 
 # Axes always need to be labeled. 
-pA <- pA + xlab('Refractive Error') + ylab(expression(log[10](threshold)))
-pA # show the graph with the new axes
 
 # OK. We have a scatter plot of the data from one condition. At this point you realize that you want another type of graph. We just want to know how thresholds vary across the different conditions. Let's use a bar chart.
 
@@ -58,17 +57,23 @@ View(dFull_wide)
 
 #### RUN THE FUNCTIONS AT THE BOTTOM OF THE SCRIPT ####
 
-# This is a within-subjects design -- each of A, L, M, S-, S+, and S were measured within subjects. 
-datac <- summarySEwithin(dFull_long, measurevar='value', withinvars='variable', idvar='subject')
+# This is a within-subjects design -- each of A, L, M, S-, S+, and S were measured within subjects.
+colnames(dFull_long) <- c('subject', 'RE', 'variable', 'value')
+
+datac <- summarySEwithin(dFull_long, measurevar='val', withinvars='variable', idvar='subject')
 datac
 
 #### bar-graph with within subject error-bars ####
-pBar <- ggplot(datac, aes(x=variable, y=value, group=1)) + geom_bar(aes(fill = variable), stat = 'identity') + geom_errorbar(width=.1, aes(ymin=value-ci, ymax=value+ci))
-pBar
+pBar <- ggplot(datac, aes(x=variable, y=value, group=1)) + geom_bar(aes(fill = variable), stat = 'identity') + geom_errorbar(width=.1, aes(ymin=value-se, ymax=value+se)) 
+#col <- c('gray5', 'gray15', 'gray25', 'gray45', 'gray55', 'gray75')
+
+#pBar <- pBar + scale_fill_manual(values = col)
+#pBar
 
 #### box-plot ####
 pBox <- ggplot(data = dFull_long, aes(x = variable, y=value)) + geom_boxplot() + xlab('stimulus') + ylab(expression(log[10](threshold)))
 print(pBox)
+
 # What about writing a plot instead of viewing it?
 ggsave('boxplot.tif', device = 'tiff', plot = pBox)
 
@@ -96,7 +101,10 @@ ggsave('boxplot.tif', device = 'tiff', plot = pBox)
 # install.packages("devtools")
 devtools::install_github("thomasp85/patchwork")
 library(patchwork)
-pA + pBox + pBar
+pA + pBox / pBar
+
+pA <- pA + stat_smooth(method = 'lm')
+pA
 
 #### Lecture 4 - t-tests ####
 dFull <- read.csv('https://raw.githubusercontent.com/hashtagcpt/biostats2/master/full_data.csv')
@@ -121,7 +129,7 @@ dTransform <- data.frame(subject,RE,t1,t2,t3,t4,t5,t6)
 colnames(dTransform) <- c('subject','RE','A','L','M','Sneg','Spos','S')
 
 Snew <- dTransform$S / dTransform$A
-ts<-t.test(Snew, mu = 1)
+ts <- t.test(Snew, mu = 1)
 
 Mnew <- dTransform$M / dTransform$A
 tm<-t.test(Mnew, mu = 1)
@@ -219,6 +227,7 @@ dt <- mtcars[1:5,1:6]
 # The %>% is a new syntax style that was introduced by Hadley Wickham in his tidyverse. It tends to make code more readable - this operator feeds through to functions.
 
 dt %>% kable() %>% kable_styling()
+dt |> kable() |> kable_styling()
 
 # If you look at the Viewer tab in the bottom right pane of R Studio you should see a nice table. This table can be output to HTML (which can be imported to word) or even PDF.
 
@@ -290,8 +299,10 @@ re_data_white <- subset(re_dat, re_dat$condition == 'White')
 summarySE <- function(data=NULL, measurevar, groupvars=NULL, na.rm=FALSE,
                       conf.interval=.95, .drop=TRUE) {
   library(plyr)
-  
-  # New version of length which can handle NA's: if na.rm==T, don't count them
+
+  print(measurevar)  
+
+    # New version of length which can handle NA's: if na.rm==T, don't count them
   length2 <- function (x, na.rm=FALSE) {
     if (na.rm) sum(!is.na(x))
     else       length(x)

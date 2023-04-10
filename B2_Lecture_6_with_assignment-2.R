@@ -143,7 +143,7 @@ vals <- c(ts$p.value, tm$p.value, tl$p.value)
 
 # The options on cor.test default to a two sided test (test whether the correlation is positive or negative). What is the p-value if we use a directional hypothesis as our alternative (see help for the input parameter)?
 
-# Sometimes our data our not normally distrubuted. In that case we'll want a non-parametric test. The R function cor.test() provides an option for a non-parametric test, Spearman's Rho. Perform a Spearman's test on RE versus Spos -- what happens to the p-value? (Hint: R will complain about ties, basically checking to see if you know that this is what you want, set the parameter exact = FALSE to stop it from complaining)
+# Sometimes our data our are not normally distributed. In that case we'll want a non-parametric test. The R function cor.test() provides an option for a non-parametric test, Spearman's Rho. Perform a Spearman's test on RE versus Spos -- what happens to the p-value? (Hint: R will complain about ties, basically checking to see if you know that this is what you want, set the parameter exact = FALSE to stop it from complaining)
 
 ##### Summary statistics ####
 
@@ -370,7 +370,7 @@ summary(d_aov)
 
 TukeyHSD(d_aov)
 
-#### Bootstrap -- Lecture 6 ####
+#### Bootstrap -- Lecture 7 ####
 
 library(boot)
 
@@ -415,7 +415,7 @@ boot.ci(bootResults, type = "bca", index = 3) # airplay
 
 #### Assignment 3 ####
 
-# 1. [3 points] You modeled the Color Vision and RE experiment as a multiple regression. You found the best regression model. You can use the boostrap to get confidence intervals on the parameters for the best model. What are the boostrap confidence intervals for the parameters on the full model? 
+# 1. [3 points] You modeled the Color Vision and RE experiment as a multiple regression. You found the best regression model. You can use the bootstrap to get confidence intervals on the parameters for the best model. What are the bootstrap confidence intervals for the parameters on the full model? 
 
 # 2. [3 points] In question 4 of Assignment #2 you found the correlation of a variable S_summed  which was the square root of the squared and summed threshold values for S.positive and S.negative and found the correlation using the cor.test() function. Write a function to bootstrap the correlation of this value. What is the confidence interval on this correlation?    
 

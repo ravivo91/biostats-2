@@ -256,8 +256,8 @@ dat <- read.csv('rgb_monitor.csv')
 re_dat <- read.csv('rbg_noise_ir_data.csv')
 
 # Here's how to change the change the name of factors.
-dat$Light <- revalue(as.factor(dat$Light), c("rgb"="RGB", "white"="White"))
-re_dat$condition <- revalue(as.factor(re_dat$condition), c("rgb"="RGB", "white"="White"))
+dat$Light <- plyr::revalue(as.factor(dat$Light), c("rgb"="RGB", "white"="White"))
+re_dat$condition <- plyr::revalue(as.factor(re_dat$condition), c("rgb"="RGB", "white"="White"))
 
 # How do we take a subset of the data? 
 re_data_white <- subset(re_dat, re_dat$condition == 'White')
@@ -282,6 +282,9 @@ re_data_white <- subset(re_dat, re_dat$condition == 'White')
 
 #install.packages('car')
 #install.packagaes('QuantPsyc')
+library(car)
+library(QuantPsyc)
+
 album1 <- read.delim("http://www.discoveringstatistics.com/docs/Album%20Sales%201.dat", header = TRUE)
 
 # The line below will fail, but it provides you with the general form of the linear model function. The linear model is behind many/most of the Frequentist tests you will use on your data.
@@ -290,10 +293,15 @@ newModel <- lm(fomula = outcome ~ predictor, data = dataFrame)
 #newModel is an object that can be summarized with the summary() function which will give you the results of the inferential test.
 
 #If we apply this to our example data...
-albumSales.1 <- lm(sales ~ adverts, data = album1)
+albumSales.1 <- lm(formula = sales ~ adverts, data = album1)
 
 # Summarize our simple regression model...
 (modelSummary <- summary(albumSales.1))
+
+albumSales.0 <- lm(formula = sales ~ adverts + 0, data = album1)
+
+# Summarize our simple regression model...
+(modelSummary <- summary(albumSales.0))
 
 # We can check for the indivudal variables within our regression model. 
 ls(modelSummary)
@@ -305,11 +313,14 @@ album2 <- read.delim("http://www.discoveringstatistics.com/docs/Album%20Sales%20
 # We can compute the simple restricted model first as a baseline.
 albumSales.2 <- lm(sales ~ adverts, data = album2)
 # Now we can grow the model to include multiple predictors.
-albumSales.3 <- lm(sales ~ adverts + airplay + attract, data = album2)
+albumSales.4 <- lm(formula = sales ~ adverts + airplay, data = album2)
 
 # Now compare the summaries of the two models...
 summary(albumSales.2)
 summary(albumSales.3)
+summary(albumSales.4)
+
+anova(albumSales.1,albumSales.4)
 
 # What happened to our ability to predict album sales when we added more predictors? How do we interpret the model? The order matters, as when we add an additional predictor to the model we are holding the effects of the previous terms constant.
 
@@ -318,12 +329,13 @@ summary(albumSales.3)
 library(QuantPsyc)
 
 lm.beta(albumSales.3)
-
+lm.beta(albumSales.4)
 # We can calculate confidence intervals on our coefficients the narrower the better in their ability to predict our dependent variable.
 
 confint(albumSales.3)
 
-# How do we compare models? We can apply an ANOVA to models as we add or substract parameters. This is known as a step-wise procedure.
+# How do we compare models? We can apply an ANOVA to models as we add or subtract parameters. This is known as a step-wise procedure.
+
 
 #### Exercises - Lecture 5 ####
 dFull <- read.csv('https://raw.githubusercontent.com/hashtagcpt/biostats2/master/full_data.csv')
@@ -353,7 +365,14 @@ colnames(dTransform) <- c('subject','RE','A','L','M','Sneg','Spos','S')
 
 # 2. Find the model that maximizes R-square from the best three predictors. Then the best two. Perform an ANOVA that compares the best 3 predictor model to the best 2 predictor model.
 
+m1 <- lm(formula = RE ~ A + L + M + S + Sneg + Spos, data = dTransform)
+summary(m1)
+
+m2 <- lm(formula = RE ~ L + S, data = dTransform)
+summary(m2)
+
 # 3. Report the beta coefficients and confidence intervals for the best two predictor model.
+
 
 #### Lecture 6 ANOVA ####
 
@@ -361,7 +380,7 @@ colnames(dTransform) <- c('subject','RE','A','L','M','Sneg','Spos','S')
 dTransform_long <- melt(dTransform, id.vars = c('subject','RE')) 
 colnames(dTransform_long) <- c('subject','RE','condition', 'threshold')
 
-# There is an assumption of homogenity of variance behind the ANOVA. We can test this using Levene's Test from the car pakacage. The test checks the variance of the *residuals* for each group.  
+# There is an assumption of homogenity of variance behind the ANOVA. We can test this using Levene's Test from the car package. The test checks the variance of the *residuals* for each group.  
 library(car)
 leveneTest(dTransform_long$threshold, dTransform_long$condition, center = median)
 
@@ -370,10 +389,6 @@ d_aov <- aov(data = dTransform_long, formula = threshold ~ condition)
 summary(d_aov)
 
 TukeyHSD(d_aov)
-
-#dTransform_long$subject <- as.numeric(dTransform_long$subject)
-#d_aov_within <- glm(data = dTransform_long, formula = threshold ~ condition + (1 | subject))
-#summary(d_aov_within)
 
 
 #### USER-DEFINED FUNCTIONS: RUN the code below to get the functions normDataWithin, summarySEwithin, summarySE ####

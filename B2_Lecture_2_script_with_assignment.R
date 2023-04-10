@@ -198,8 +198,8 @@ funny_add <- function(var1,var2) {
 
 (eye_measures <- funny_add(example_data$OD, example_data$OS)) # fun tip -- enclosing a whole statement in () will print out the variable result
 
-install.packages('TeachingDemos')
-library(TeachingDemos)
+#install.packages('TeachingDemos')
+#library(TeachingDemos)
 
 #### Exercise 1 #####
 
@@ -217,17 +217,30 @@ library(TeachingDemos)
 
 #### the normality assumption ####
 set.seed(100) # set the random number generator
-d <- rnorm(1000)
+d_al <- rnorm(n = 60, mean = 24, sd = 1.5)
+
+df_al <- data.frame(d)
+colnames(df_al) <- c('axial_length')
+pal <- ggplot(data = df_al, aes(x = axial_length)) + geom_histogram()
+pal
+
+d <- rnorm(n =1000, mean = 0, sd = 1)
 
 d_dev <- (d - mean(d))
 x_axis <- c(1:length(d))
 dev_df <- data.frame(cbind(x_axis,d_dev))
 
+# This part of the code is where I make the figures for my paper ####
 # initialize the plot, ask for the point geom, ask for a line of intercept/slope
 dev_plot <- ggplot(data = dev_df, aes(x = x_axis, y = d_dev)) + geom_point(size = 4) + geom_abline(slope = 0, intercept = mean(dev_df$d_dev), color = 'red', size = 2) 
 
+print(dev_plot)
+
 # set the plot labels
 dev_plot <- dev_plot + xlab('sample') + ylab('deviation from the mean') 
+
+dev_plot <- dev_plot + theme_classic()
+dev_plot
 
 # change the them to have bigger text
 dev_plot <- dev_plot + theme(text = element_text(size=20), axis.text.x = element_text(size = 16), axis.text.y = element_text(size=16))
@@ -236,7 +249,7 @@ dev_plot <- dev_plot + theme(text = element_text(size=20), axis.text.x = element
 dev_plot
 
 # show the deviations as a histogram
-hist_plot <- ggplot(data = dev_df, aes(d_dev)) + geom_histogram() + xlab('deviation from the mean') + theme(text = element_text(size=20), axis.text.x = element_text(size = 16), axis.text.y = element_text(size=16))
+hist_plot <- ggplot(data = dev_df, aes(d_dev)) + geom_histogram(binwidth = 0.05) + xlab('deviation from the mean') + theme(text = element_text(size=20), axis.text.x = element_text(size = 16), axis.text.y = element_text(size=16))
 
 hist_plot
 
@@ -246,7 +259,7 @@ hist_plot
 # Create a blank script file that is called [yourname]_assignment_1.R where yourname is your fullname without spaces. 
 
 # A1.1 [2 points] ####
-# Locate a data set. You may use data that you yourself have (include those data with your submission) or use the data set at this link: https://files.ontario.ca/pssd/en-2018-pssd-20190614.csv 
+# Locate a data set. (Hint: McFarland & Yates is a good resource). You may use data that you yourself have (include a reference to those data with your submission) or use the data set at this link: https://files.ontario.ca/pssd/en-2018-pssd-20190614.csv 
 
 # A1.2 [2 points] ####
 # Load in the data set as shown above and assign it to a variable (e.g., d).
@@ -257,8 +270,21 @@ hist_plot
 # A1.4 [1 point] #### 
 # 5. Create a two-element string vector using c() called trick_type. The two strings should be 'trick1' and 'trick2'
 
+type_type <- c('trick1','trick2')
+
+user_guess <- readline('Which trick is it? ')
+
+ if (user_guess == 1 ) {
+  print('Yay!')
+  } 
+ else if (user_guess == 2) {
+  print('Boo!')
+} else {
+  print('that is not a valid trick')
+}
+  
 # A1.5 [3 points] ####
-# Create an if / else if / else statement that runs either trick1 or trick2 depending on another variable you set, for example if (do_trick == 'trick1') { [CODE] }. Outside the if statment set a variable called 'user_guess' that contains the guess for the user. The else statement should print "That is not a valid trick" if your do_trick variable is neither "trick1" or "trick2".
+# Create an if / else if / else statement that runs either trick1 or trick2 depending on another variable you set, for example if (do_trick == 'trick1') { [CODE] }. Outside the if statement set a variable called 'user_guess' that contains the guess for the user. The else statement should print "That is not a valid trick" if your do_trick variable is neither "trick1" or "trick2".
 
 # A1.6 [6 points] ####
 # Your task is to create a function called trimmed_mean. This function will remove variables from our input data that are greater than and less than a user-defined number of standard deviations above AND below the mean. Here is some code to get you started:

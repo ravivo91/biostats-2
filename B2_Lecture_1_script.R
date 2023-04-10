@@ -1,8 +1,9 @@
 #### BIOSTATS 2 - LECTURE SCRIPT 1 ####
 rm(list = ls()) 
 
-setwd("C:/Users/taylorpc/Downloads")
+#setwd("C:/Users/taylorpc/Downloads")
 
+setwd("C:/Users/chris/Dropbox/Teaching/Teaching_2023/biostats-2-master/biostats-2")
 
 #### R as a calculator ####
 
@@ -28,7 +29,7 @@ x <- x - 7
 print(x)
 x
 
-# concatinate and case sensitivity
+# concatinte and case sensitivity
 x <- c(1,2,3)
 X <- c(1:10)
 v <- 'a'
@@ -45,6 +46,7 @@ log(vRoot, base = 10)
 # modulo
 13 %% 4
 
+# tidyverse send command
 # %>%
 
 # getting help
@@ -108,16 +110,19 @@ new_data_vector <- data$threshold
 # putting together
 d<-data.frame(rbind(vVector,c(1,2,3)))
 
+colnames(d) <- c('first','second','third')
+
 #### Reading in Data ####
 # read in .csv -- easiest
 example_data <- read.csv('Example-Data-1.csv')
+example_data_tidy <- read_csv('Example-Data-1.csv')
 
 # read in an excel xlsx file
 #install.packages('readxl')
 library(readxl)
 
 # read in excel -- must supply the sheet name or index
-example_excel <- read_xlsx('Example-Data-1.xlsx',sheet = 1)
+example_excel <- read_xlsx('Example-Data-1.xlsx', sheet = 1)
 
 # read in a matlab .mat file
 # install.packages('R.matlab')
@@ -134,10 +139,10 @@ example_data_gui <- read.csv(file.choose(), header = TRUE )
 
 #### fundamental programming concepts ####
 
-# We'll usually need to clean-up and reformat data (here I mean data in the general comp sci sense, not data from an experiment) via code. This is not unique to R. Other languages have more elaborate and specific techniques for changing one type of data to another. R is (trust me) on the user friendly end of the spectrum of computer lanagues. To do our clean-up and other tasks where we need to tell the computer to make a decision, we'll need statements that control the flow of a program. What is flow? In short, it is what code gets executed at a given step. Let's dive in...
+# We'll usually need to clean-up and reformat data (here I mean data in the general comp sci sense, not data from an experiment) via code. This is not unique to R. Other languages have more elaborate and specific techniques for changing one type of data to another. R is (trust me) on the user friendly end of the spectrum of computers. To do our clean-up and other tasks where we need to tell the computer to make a decision, we'll need statements that control the flow of a program. What is flow? In short, it is what code gets executed at a given step. Let's dive in...
 
 # The if statement. 
-# This is a fundamental statement most programing languages. An if statement works linke a logical statement "If X then Y". Below is an if statement in action.
+# This is a fundamental statement most programing languages. An if statement works link a logical statement "If X then Y". Below is an if statement in action.
 
 test_variable <- TRUE  # NB naming variables is an art, not too long, not too short, you don't want spaces and they can't start with a number.
 var_to_print <- 3
@@ -145,15 +150,15 @@ if (test_variable == TRUE) {
         print(data$threshold[var_to_print])
 }
 
-# If we break down this 'if' we have two main parts. The first is the statment enclosed in () that follows our keyword 'if'*. This is a logical statement, if it evaluates to TRUE then the part of the code in curly braces {}, the code block will be executed. Try changing the value of 'test_variable' to FALSE and re-run this code.
+# If we break down this 'if' we have two main parts. The first is the statement enclosed in () that follows our keyword 'if'*. This is a logical statement, if it evaluates to TRUE then the part of the code in curly braces {}, the code block will be executed. Try changing the value of 'test_variable' to FALSE and re-run this code.
 
 ### *NB R has certain keywords that you can use for variable names or if you choose a variable name that is that of a function, weird things can happen..)
 
 # With if statements we can happy test conditions and use code blocks. Often you'll see if statements chained together in this way, an 'if' statement, one or more 'else if' statements, then 'else'. Here is an example.
 
-blue_jays_winning_percentage <- 0 #.601
+blue_jays_winning_percentage <- 0.499
 
-if (blue_jays_winning_percentage > .600) {
+if (blue_jays_winning_percentage > .600)  {
         print('The Blue Jays are better than OK!')
 } else if (blue_jays_winning_percentage <= .599 && blue_jays_winning_percentage >= .500) {
         print('OK Blue Jays!')
@@ -180,15 +185,19 @@ while (ctr <= length(example_data$Condition)) {
         ctr <- ctr + 1
 }
 
+
+
 # QUESTION -- when would we need to use a for loop versus a while loop?
 
 # User defined functions. These can *really* make your life easier and code cleaner, if you find yourself repeating a lot of code in your script. For example, if you want to reproduce several of the same type of plot with different x/y variables, you can write a function that takes those x/y variables as inputs and reproduce the plot. Here is a contrived example of a user-defined function in R
 
-funny_add <- function(var1,var2) {
+funny_add_zero <- function(var1,var2 = 0) {
         var1 + var2 + var1/2 + var2/2
 }
 
 (eye_measures <- funny_add(example_data$OD, example_data$OS)) # fun tip -- enclosing a whole statement in () will print out the variable result
+
+funny_add_zero(5)
 
 install.packages('TeachingDemos')
 library(TeachingDemos)
