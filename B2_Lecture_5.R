@@ -287,6 +287,8 @@ library(QuantPsyc)
 
 album1 <- read.delim("http://www.discoveringstatistics.com/docs/Album%20Sales%201.dat", header = TRUE)
 
+album1 <- read.csv('album_sales.csv')
+
 # The line below will fail, but it provides you with the general form of the linear model function. The linear model is behind many/most of the Frequentist tests you will use on your data.
 newModel <- lm(fomula = outcome ~ predictor, data = dataFrame)
 
