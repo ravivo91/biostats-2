@@ -526,12 +526,12 @@ m_choice <- 2
 # We also know the number of trials for each condition because we used what's known as the method of constant stimuli
 n_trials <- 25
 
-psy_file <- 'ONOFF02-dog-ON-1-04-Apr-2019.mat'
+psy_file <- 'ONOFF01-dog-OFF-1-29-Mar-2019.mat'
 d_file <- readMat(psy_file)
 
 # do some data clean-up and get meaningful information from the filename
 # parse the file name into a list
-f_str <- str_split(psy_files,'-')
+f_str <- str_split(psy_file,'-')
 
 # pasre the filename into subject, stimulus, condition, block
 subject <- f_str[[1]][1] # we can parse the string to get condition info
