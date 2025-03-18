@@ -285,7 +285,7 @@ re_data_white <- subset(re_dat, re_dat$condition == 'White')
 library(car)
 library(QuantPsyc)
 
-album1 <- read.delim("http://www.discoveringstatistics.com/docs/Album%20Sales%201.dat", header = TRUE)
+#album1 <- read.delim("http://www.discoveringstatistics.com/docs/Album%20Sales%201.dat", header = TRUE)
 
 album1 <- read.csv('album_sales.csv')
 
@@ -305,17 +305,19 @@ albumSales.0 <- lm(formula = sales ~ adverts + 0, data = album1)
 # Summarize our simple regression model...
 (modelSummary <- summary(albumSales.0))
 
-# We can check for the indivudal variables within our regression model. 
+# We can check for the individual variables within our regression model. 
 ls(modelSummary)
 sqrt(modelSummary$r.squared)
 
 #### Multiple Regression ####
-album2 <- read.delim("http://www.discoveringstatistics.com/docs/Album%20Sales%202.dat", header = TRUE)
+
+# get rid of this
+#album2 <- read.delim("http://www.discoveringstatistics.com/docs/Album%20Sales%202.dat", header = TRUE)
 
 # We can compute the simple restricted model first as a baseline.
-albumSales.2 <- lm(sales ~ adverts, data = album2)
+albumSales.2 <- lm(sales ~ adverts, data = album1)
 # Now we can grow the model to include multiple predictors.
-albumSales.4 <- lm(formula = sales ~ adverts + airplay, data = album2)
+albumSales.4 <- lm(formula = sales ~ adverts + airplay, data = album1)
 
 # Now compare the summaries of the two models...
 summary(albumSales.2)
@@ -329,15 +331,15 @@ anova(albumSales.1,albumSales.4)
 # To check how our coefficients change as we can look at the standarized beta coefficients which is in the QuantPsyc package
 #install.packages('QuantPsyc')
 library(QuantPsyc)
-
-lm.beta(albumSales.3)
+library(lm.beta)
+QuantPsyc::lm.beta(albumSales.1)
 lm.beta(albumSales.4)
 # We can calculate confidence intervals on our coefficients the narrower the better in their ability to predict our dependent variable.
 
-confint(albumSales.3)
+confint(albumSales.4)
 
 # How do we compare models? We can apply an ANOVA to models as we add or subtract parameters. This is known as a step-wise procedure.
-
+library(tidyverse)
 
 #### Exercises - Lecture 5 ####
 dFull <- read.csv('https://raw.githubusercontent.com/hashtagcpt/biostats2/master/full_data.csv')
@@ -367,6 +369,7 @@ colnames(dTransform) <- c('subject','RE','A','L','M','Sneg','Spos','S')
 
 # 2. Find the model that maximizes R-square from the best three predictors. Then the best two. Perform an ANOVA that compares the best 3 predictor model to the best 2 predictor model.
 
+# In our initial silent substitution and color contrast and myopia study, we did not go this route? We treated the conditions independently -- what could have justified this choice? 
 m1 <- lm(formula = RE ~ A + L + M + S + Sneg + Spos, data = dTransform)
 summary(m1)
 
@@ -378,11 +381,18 @@ summary(m2)
 
 #### Lecture 6 ANOVA ####
 
+
+# The old way ####
+library(reshape2)
 # NB Run code from the Lecture 5 exercises.
 dTransform_long <- melt(dTransform, id.vars = c('subject','RE')) 
+
+# The tidyverse way
+dTransform_long <- dTransform %>% pivot_longer(cols = -c(subject, RE), names_to = "variable", values_to = "value")
+
 colnames(dTransform_long) <- c('subject','RE','condition', 'threshold')
 
-# There is an assumption of homogenity of variance behind the ANOVA. We can test this using Levene's Test from the car package. The test checks the variance of the *residuals* for each group.  
+# There is an assumption of homogeneity of variance behind the ANOVA. We can test this using Levene's Test from the car package. The test checks the variance of the *residuals* for each group.  
 library(car)
 leveneTest(dTransform_long$threshold, dTransform_long$condition, center = median)
 
@@ -390,8 +400,29 @@ leveneTest(dTransform_long$threshold, dTransform_long$condition, center = median
 d_aov <- aov(data = dTransform_long, formula = threshold ~ condition)
 summary(d_aov)
 
+# Post-hoc tests
 TukeyHSD(d_aov)
 
+# But we need repeated measures as the measures from each subject are not independent
+
+# Run repeated measures ANOVA using aov()
+rm_aov <- aov(threshold ~ condition + Error(subject/condition), data = dTransform_long)
+summary(rm_aov)
+
+# But! We can't just use our TukeyHSD function now! Boo.
+# Let's try something different...with ezANOVA
+# 
+library(ez)
+ezANOVA(
+  data = dTransform_long,
+  dv = .(threshold),
+  wid = .(subject),
+  within = .(condition)
+)
+
+#Great! But By default, ezANOVA uses the sums‐of‐squares from R’s base aov() function, which are sequential (Type I) rather than Type III. In many balanced repeated measures designs the difference isn’t an issue, but if you require Type III sums‐of‐squares (commonly needed for unbalanced designs or complex models), you’d need to use alternative approaches—such as fitting a linear model with lm() and then applying the Anova() function from the car package.
+
+# Take-away: if you're using an ANOVA model, especially ones that are two or more-way then you'll need to be more careful.
 
 #### USER-DEFINED FUNCTIONS: RUN the code below to get the functions normDataWithin, summarySEwithin, summarySE ####
 
