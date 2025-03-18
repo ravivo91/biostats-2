@@ -459,7 +459,7 @@ summary(anova.genotype)
 etaSquared(anova.genotype)
 
 #### Lecture 7 - Power Analysis ####
-install.packages('pwr')
+#install.packages('pwr')
 library(pwr)
 
 # what is the power of a two-group t-test with a moderate effect size and an alpha of .05?
@@ -474,20 +474,24 @@ pwr.t.test(n=48*2,d=0.2,sig.level=0.05, type = "paired", alternative = "two.side
 
 # choose a range of effect sizes of interest using the sequence function
 min_eff <- 0.25 # minimally interesting
-max_eff <- 0.75 # wishful thinking effect size
+max_eff <- 1.5 # wishful thinking effect size
 eff_sizes <- seq(from = min_eff, to = max_eff, length.out = 1000)
 
-n_var <- c() # creat an empty variable
+n_var <- c() # create an empty variable
 # loop through and calculate  
 for (tmp in eff_sizes) {
   print(tmp)
-  pwr.tmp <- pwr.t.test(d=tmp, power = .8, sig.level=0.05)
+  pwr.tmp <- pwr.t.test(d=tmp, power = .75, sig.level=0.05)
+  #pwr.tmp <- pwr.t.test(d=tmp, power = .5, sig.level=0.05, type = 'paired')
+
   n_var <- c(n_var, pwr.tmp$n)  
 }
 
 df_pwr_analysis <- data.frame(eff_sizes, n_var)
 
-(n_v_eff_plot <- ggplot(data = df_pwr_analysis, aes(x = eff_sizes, y = n_var)) + geom_line(size = 2) + xlab("effect size (Cohen's d)") + ylab('number of samples required for power = 80%') + theme(text = element_text(size=16), axis.text.x = element_text(size = 16), axis.text.y = element_text(size=16)))
+y_max <- 50 # I can run at most 50 subjects per group
+
+(n_v_eff_plot <- ggplot(data = df_pwr_analysis, aes(x = eff_sizes, y = n_var)) + geom_line(size = 2) + xlab("effect size (Cohen's d)") + ylab('number of samples required for power = 80%')  + ylim(0,y_max) + theme(text = element_text(size=16), axis.text.x = element_text(size = 16), axis.text.y = element_text(size=16)))
 
 # what is the n for a t-test with a smallish effect size for a 20% chance of missing a true effect? Suprisingly large! The other type of analysis that could be of interest could come from having a fixed n and computing power/effect size for varying levels of effect size/power. This situation could arise if the main limit on your data collection comes from time/cost. 
 

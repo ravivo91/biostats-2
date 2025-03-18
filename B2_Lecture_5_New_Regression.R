@@ -21,9 +21,7 @@ data$CSF <- runif(nrow(data), 0.1, 2) + rnorm(nrow(data))
 # Note that I'm using the tidyverse data passing short hand and the assingnment operator.
 #
 # The mutate() function is being used here -- note it is one of those functions in both plyr and dplyr functions -- this code will call the dplyr version.  
-data <- data %>%
-  mutate(CSF = ifelse(condition == "Patient" & orientation %in% c("vertical", "horizontal"), 
-                      CSF * 1.2, CSF)) # Patients have higher thresholds at cardinal orientations
+data <- data %>% mutate(CSF = ifelse(condition == "Patient" & orientation %in% c("vertical", "horizontal"), CSF * 1.2, CSF)) # Patients have higher thresholds at cardinal orientations
 
 # Viewing the first few rows of the dataset is a nice check... are these data in wide or long format?
 head(data)
@@ -31,16 +29,18 @@ head(data)
 
 #### Fitting a multiple regression linear model ####
 
-# Fit a linear model
+# Fit a linear model?
+#
+# What about the repeated measures? It's out of scope as we'd need a whole new model to partial out the correlation within subject
 lm_model <- lm(CSF ~ condition * orientation * spatial_frequency, data = data)
 
 # Summarize the model
 summary(lm_model)
 
 # Visualize the model fit
-ggplot(data, aes(x = spatial_frequency, y = CSF, color = condition)) +
+ggplot(data, aes(x = spatial_frequency, y = CSF, color = orientation)) +
   geom_point() +
-  geom_smooth(method = "lm", formula = y ~ x) +
+  geom_smooth(method = "lm", formula = y ~ x, color = 'black') +
   facet_wrap(~orientation) +
   theme_minimal() +
   labs(title = "CSF by Spatial Frequency, Condition, and Orientation",
@@ -56,15 +56,15 @@ library(dplyr)
 # Fit a linear mixed-effects model
 # CSF is the outcome, condition, orientation, and spatial_frequency are fixed effects
 # Random intercepts for subjects
-lmm_model <- lmer(CSF ~ condition * orientation * spatial_frequency + (1|subject), data = data)
+lmm_model <- lmer(CSF ~ condition + orientation + spatial_frequency + (1|subject), data = data)
 
 # Summary of the model
 summary(lmm_model)
 
-# Optional: Visualize the model
+# Optional: Visualize the model - does this work? Nope.
 library(ggplot2)
 data$predicted_CSF <- predict(lmm_model)
-ggplot(data, aes(x = spatial_frequency, y = CSF, color = condition)) +
+ggplot(data, aes(x = spatial_frequency, y = CSF, color = orientation)) +
   geom_point(alpha = 0.5) +  # Original data points
   geom_line(aes(y = predicted_CSF), size = 1) +  # Fitted values
   facet_wrap(~orientation + subject, scales = "free") +
@@ -111,12 +111,14 @@ set.seed(617) # Ensure reproducibility
 contrast_levels <- seq(0.01, 0.1, length.out = 7)
 odds_of_correct <- exp(1 + 25 * contrast_levels)# Assuming a relationship for simulation
 prob_correct <- odds_of_correct / (1 + odds_of_correct)
-responses <- prob_correct - .15
+
+responses <- (prob_correct - .15)
 data <- data.frame(contrast_levels, responses)
 
-# making predictions
-new_data <- data.frame(contrast_levels = seq(min(contrast_levels), max(contrast_levels), length.out = 100))
-new_data$predicted_prob <- predict(fit, newdata = new_data, type = "response")
+# Fit a logistic regression model
+fit <- glm(responses ~ contrast_levels, family = gaussian, data = data)
+
+new_data$predicted_prob <- predict(fit, newdata = new_data)
 
 # Assuming a similar approach to generate new responses based on fitted probabilities
 predicted_data <- data.frame(contrast_levels = new_data$contrast_levels, predicted_prob = new_data$predicted_prob)
@@ -126,8 +128,3 @@ ggplot(predicted_data, aes(x = contrast_levels, y = predicted_prob)) +
   geom_point() +
   #geom_line(data = new_data, aes(x = contrast_levels, y = predicted_prob), color = "red") +
   labs(title = "Predicted Psychometric Function with Original Fitted Curve", x = "Contrast Levels", y = "Predicted Probability of Correct Response")
-
-
-
-
-
