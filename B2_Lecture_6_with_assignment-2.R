@@ -356,11 +356,18 @@ colnames(dTransform) <- c('subject','RE','A','L','M','Sneg','Spos','S')
 
 #### Lecture 6 ANOVA ####
 
+
+# The old way ####
+library(reshape2)
 # NB Run code from the Lecture 5 exercises.
 dTransform_long <- melt(dTransform, id.vars = c('subject','RE')) 
+
+# The tidyverse way
+dTransform_long <- dTransform %>% pivot_longer(cols = -c(subject, RE), names_to = "variable", values_to = "value")
+
 colnames(dTransform_long) <- c('subject','RE','condition', 'threshold')
 
-# There is an assumption of homogenity of variance behind the ANOVA. We can test this using Levene's Test from the car pakacage. The test checks the variance of the *residuals* for each group.  
+# There is an assumption of homogeneity of variance behind the ANOVA. We can test this using Levene's Test from the car package. The test checks the variance of the *residuals* for each group.  
 library(car)
 leveneTest(dTransform_long$threshold, dTransform_long$condition, center = median)
 
@@ -368,7 +375,29 @@ leveneTest(dTransform_long$threshold, dTransform_long$condition, center = median
 d_aov <- aov(data = dTransform_long, formula = threshold ~ condition)
 summary(d_aov)
 
+# Post-hoc tests
 TukeyHSD(d_aov)
+
+# But we need repeated measures as the measures from each subject are not independent
+
+# Run repeated measures ANOVA using aov()
+rm_aov <- aov(threshold ~ condition + Error(subject/condition), data = dTransform_long)
+summary(rm_aov)
+
+# But! We can't just use our TukeyHSD function now! Boo.
+# Let's try something different...with ezANOVA
+# 
+library(ez)
+ezANOVA(
+  data = dTransform_long,
+  dv = .(threshold),
+  wid = .(subject),
+  within = .(condition)
+)
+
+#Great! But By default, ezANOVA uses the sums‐of‐squares from R’s base aov() function, which are sequential (Type I) rather than Type III. In many balanced repeated measures designs the difference isn’t an issue, but if you require Type III sums‐of‐squares (commonly needed for unbalanced designs or complex models), you’d need to use alternative approaches—such as fitting a linear model with lm() and then applying the Anova() function from the car package.
+
+# Take-away: if you're using an ANOVA model, especially ones that are two or more-way then you'll need to be more careful.
 
 #### Bootstrap -- Lecture 7 ####
 
