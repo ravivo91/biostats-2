@@ -529,7 +529,9 @@ library(R.matlab)
 
 # The MathWorks did some dirty corporate nonsense... let's see how I got here...
 
-#psy_file_download <- download.file('https://github.com/hashtagcpt/biostats-2/raw/master/ONOFF01-dog-OFF-1-29-Mar-2019.mat','ONOFF01-dog-OFF-1-29-Mar-2019_v7.mat') 
+# GitHub does not play nice with this binary anymore! Agh!
+
+#psy_file_download <- download.file('https://github.com/hashtagcpt/biostats-2/raw/master/ONOFF01-dog-OFF-1-29-Mar-2019.mat','ONOFF01-dog-OFF-1-29-Mar-2019.mat') 
 
 psy_files <- 'ONOFF01-dog-OFF-1-29-Mar-2019_v7.mat'
 d_file <- readMat('ONOFF01-dog-OFF-1-29-Mar-2019_v7.mat')
@@ -591,6 +593,8 @@ threshold_slope(psymet_pred_df$fit, psymet_pred_df$contrast, thresh_level)
 #
 #Once we have our new resampled data, we need to go through the psychometric fitting procedure. All of the above should go into your bootstrap statistic function. You'll have it return the $x_th output variable from the threshold_slope function above. This is the value you'll want to feed into boot.ci to calculate a confidence interval from....
 
+#...just kidding.
+
 
 #### Lecture 9 - Bayes' Factors ####
 
@@ -643,6 +647,9 @@ plot(samp_cA_bf)
 dat <- read.csv('https://raw.githubusercontent.com/hashtagcpt/biostats2/master/Monitor_Birds.csv')
 
 # The Bayes Factor ANOVA will perform a stepwise procedure to look at the effect of each of our variables on BF
+
+dat$condition <- as.factor(dat$condition)
+dat$Light <- as.factor(dat$condition)
 anovaBF(data = dat, formula = postAx ~ condition*Light, whichModels = "top")
 
 # We can check post-hoc with BF t-tests to see how they compare -- here's the main effect of condition.
