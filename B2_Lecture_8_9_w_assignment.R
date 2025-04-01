@@ -519,13 +519,13 @@ library(psyphy) # you'll probably need to install.packages() this... needed for 
 
 # This was a two-alternative forced-choice task, but this psychometric function form can be used for any number of alternatives, e.g., a 10 letter ID task.
 m_choice <- 2
+
 # We also know the number of trials for each condition because we used what's known as the method of constant stimuli
 n_trials <- 25
 
 # We need to download and set the appropriate working directories as the R.matlab toolbox does not use URL downloads. Can you discover a way to fetch the file from the github site and download it automatically?
 
-
-library(R.matlab)
+# But...
 
 # The MathWorks did some dirty corporate nonsense... let's see how I got here...
 
@@ -545,6 +545,9 @@ subject <- f_str[[1]][1] # we can parse the string to get condition info
 stim <- f_str[[1]][2]
 cond <- f_str[[1]][3]
 block <- f_str[[1]][4]
+
+n_trials <- 25
+n_choice <- 2
 
 # We have refractive error data in this file and we can get the average RE for OD and OS. Might as well, right?
 re <- (d_file$OD + d_file$OS)/2
@@ -632,13 +635,18 @@ library(BayesFactor)
 # We can compute a Bayes Factor with with no null interval. This is like NHST. 
 (cA_bf <- correlationBF(dTransform$RE, dTransform$A))
 
-# But a Bayes Factor is more flexible -- let's define a positive correlation as being interesting. 
-(cA_bf <- correlationBF(dTransform$RE, dTransform$A, nullInterval = c(0,1)))
-
 # We can sample from the posterior distribution. If we used the null hypothesis this is very similar to using the bootstrap. However, we defined a prior distribution of weighting the probability of a positive correlation to be higher. 
 samp_cA_bf <- posterior(cA_bf, iterations = 1000)
 summary(samp_cA_bf)
 plot(samp_cA_bf)
+
+# But a Bayes Factor is more flexible -- let's define a positive correlation as being interesting. 
+
+(cA_bf <- correlationBF(dTransform$RE, dTransform$A, nullInterval = c(0,1)))
+samp_cA_bf <- posterior(cA_bf, iterations = 1000, index = 2)
+summary(samp_cA_bf)
+plot(samp_cA_bf)
+
 
 # The Bayes Factor package offer quick and easy computation of for a variety of designs. Let's check the help...
 ?BayesFactor
@@ -649,7 +657,7 @@ dat <- read.csv('https://raw.githubusercontent.com/hashtagcpt/biostats2/master/M
 # The Bayes Factor ANOVA will perform a stepwise procedure to look at the effect of each of our variables on BF
 
 dat$condition <- as.factor(dat$condition)
-dat$Light <- as.factor(dat$condition)
+dat$Light <- as.factor(dat$Light)
 anovaBF(data = dat, formula = postAx ~ condition*Light, whichModels = "top")
 
 # We can check post-hoc with BF t-tests to see how they compare -- here's the main effect of condition.
